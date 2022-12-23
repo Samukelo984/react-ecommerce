@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { SET_ACTIVE_USER } from "../../redux/slice/AuthSlice";
 import styles from "./Header.module.scss";
 import { FaShoppingCart, FaTimes, FaUserCircle } from "react-icons/fa";
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
@@ -33,6 +35,8 @@ const Header = () => {
   const [displayName, setDisplayName] = useState("");
   const navigate = useNavigate();
 
+  const dispatch = useDispatch();
+
   const toggleMenu = () => {
     setShowMenu(!showMenu);
   };
@@ -56,13 +60,28 @@ const Header = () => {
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
+        console.log(user);
+        // eslint-disable-next-line no-unused-vars
         const uid = user.uid;
-        setDisplayName(user.displayName);
+        if (user.displayName == null) {
+          const u1 = user.email.slice(0, -10);
+          const uName = u1.charAt(0).toLocaleUpperCase() + u1.slice(1);
+          setDisplayName(uName);
+        } else {
+          setDisplayName(user.displayName);
+        }
+        dispatch(
+          SET_ACTIVE_USER({
+            email: user.email,
+            userName: user.displayName ? user.displayName : displayName,
+            userID: user.uid,
+          })
+        );
       } else {
         setDisplayName("");
       }
     });
-  }, []);
+  }, [dispatch, displayName]);
 
   return (
     <header>
