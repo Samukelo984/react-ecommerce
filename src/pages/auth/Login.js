@@ -5,7 +5,11 @@ import { FaGoogle } from "react-icons/fa";
 import loginImg from "../../assets/login.png";
 import Card from "../../components/card/Card";
 import { auth } from "../../firebase/Firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import {
+  GoogleAuthProvider,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+} from "firebase/auth";
 import { toast, ToastContainer } from "react-toastify";
 import Loader from "../../components/loader/Loader";
 
@@ -28,6 +32,21 @@ const Login = () => {
       })
       .catch((error) => {
         setLoading(false);
+        toast.error(error.message);
+      });
+  };
+
+  // GOOGLE LOGIN
+  const provider = new GoogleAuthProvider();
+  const handleGoogleLogin = () => {
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        const user = result.user;
+        toast.success("Logged in successfully!");
+        navigate("/");
+        console.log(user);
+      })
+      .catch((error) => {
         toast.error(error.message);
       });
   };
@@ -58,13 +77,18 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <button className="--btn --btn-primary --btn-block">Login</button>
+              <button className="--btn --btn-primary --btn-block" type="submit">
+                Login
+              </button>
               <div className={styles.links}>
                 <Link to="/reset">Forgot Password</Link>
               </div>
               <p>--or--</p>
             </form>
-            <button className="--btn --btn-danger --btn-block" type="submit">
+            <button
+              className="--btn --btn-danger --btn-block"
+              onClick={handleGoogleLogin}
+            >
               <FaGoogle color="#fff" /> Login With Google
             </button>
             <span className={styles.register}>
